@@ -71,7 +71,10 @@ class Wire():
 
     def run(self):
         if self.value is None:
-            self.value = self.need.run()
+            if self.need is not None:
+                self.value = self.need.run()
+            else:
+                raise ValueError(f"Wire {self.name} has no initial value or need")
         return self.value
 
     def update_need(self, need):
@@ -91,7 +94,7 @@ for eq, res in data:
     if res not in Wire._instances:
         Wire(res, need=Device(op, w1, w2))
     else:
-        Wire._instances[res].add_need(Device(op, w1, w2))
+        Wire._instances[res].update_need(Device(op, w1, w2))
 
 output_wires = []
 for n, wire in Wire._instances.items():
@@ -102,5 +105,4 @@ for n, wire in Wire._instances.items():
 output_wires = sorted(output_wires, key=lambda x: int(x.name[1:]), reverse=True)
 number_bin = "".join([str(w.value) for w in output_wires])
 number = int(number_bin, 2)
-from IPython import embed; embed(header="puzzle.py	l:105")
-print(len(number_bin), number)
+print(number)
